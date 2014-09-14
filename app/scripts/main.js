@@ -23,6 +23,7 @@ $('document').ready(function () {
         touchPlayTimeout: 3000,
         moveTimeoutID: null,
         rightBoundary: null,
+        touchSpeed: 25,
     
         // methods
         step: function (timestart) {
@@ -75,7 +76,7 @@ $('document').ready(function () {
                 percentage = (this.progress * (100 / this.msTotal));
 
             positionX = this.direction * percentage;
-            positionX = positionX + (touchX / 100);
+            positionX = positionX + (touchX / this.touchSpeed);
             positionX = this.positionBounderies(positionX);
             positionX += '%';
 
@@ -106,6 +107,8 @@ $('document').ready(function () {
                 
                 clearTimeout(self.animationFrameID);
                 clearTimeout(self.moveTimeoutID);
+
+                self.$moveElement.addClass('touch');
             
             });
 
@@ -127,13 +130,15 @@ $('document').ready(function () {
                     playFrom = playFrom - self.progress;
 
                     self.step(playFrom);
+                
+                    self.$moveElement.removeClass('touch');
 
                 }, self.touchPlayTimeout);
 
             });
 
             this.$moveElement.on('touchmove', function (e) {
-                console.log(e);
+
                 var touch = e.originalEvent.touches[0],
                     touchPosition = touch.pageX - self.$panorama.width();
 
