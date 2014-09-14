@@ -24,6 +24,10 @@ $('document').ready(function () {
         moveTimeoutID: null,
         rightBoundary: null,
         touchSpeed: 25,
+        touchDistance: {
+            start: 0,
+            end: 0
+        },
     
         // methods
         step: function (timestart) {
@@ -104,11 +108,15 @@ $('document').ready(function () {
                 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
-                
+
+                var touch = e.originalEvent.touches[0];
+
                 clearTimeout(self.animationFrameID);
                 clearTimeout(self.moveTimeoutID);
 
-                self.$moveElement.addClass('touch');
+                //self.$moveElement.addClass('touch');
+
+                self.touchDistance.start = touch.pageX;
             
             });
 
@@ -131,7 +139,7 @@ $('document').ready(function () {
 
                     self.step(playFrom);
                 
-                    self.$moveElement.removeClass('touch');
+                    //self.$moveElement.removeClass('touch');
 
                 }, self.touchPlayTimeout);
 
@@ -140,9 +148,26 @@ $('document').ready(function () {
             this.$moveElement.on('touchmove', function (e) {
 
                 var touch = e.originalEvent.touches[0],
-                    touchPosition = touch.pageX - self.$panorama.width();
+                    distance = 0;
 
-                self.dragIt(touchPosition);
+                /*
+                if (touch.pageX < self.oldX) {
+
+                    self.direction = -1;
+
+                } else if (touch.pageX > self.oldX) {
+
+                    self.direction = 1;
+
+                }
+                */
+
+                self.oldX = touch.pageX;
+                self.touchDistance.end = touch.pageX;
+
+                distance = self.touchDistance.end - self.touchDistance.start;
+
+                self.dragIt(distance);
 
             });
 
