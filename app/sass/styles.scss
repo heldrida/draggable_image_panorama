@@ -20,7 +20,12 @@ html {
 		    transform-origin:left top;
 
 		    &.touch {
+		    	position: relative;
 		    	transition: transform 0.4s ease-in-out;
+		    }
+
+		    &.dragTransition {
+		    	transition: transform 1.0s ease-out;
 		    }
 		  }
 

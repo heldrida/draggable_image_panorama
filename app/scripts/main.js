@@ -8,6 +8,7 @@ $('document').ready(function () {
         // properties
         $panorama: $('.panorama'),
         $moveElement: $('.panorama img'),
+        swipeMode: $('.panorama').data('swipe'),
         timestart: 0,
         seconds: 12,
         msTotal: 0,
@@ -20,8 +21,10 @@ $('document').ready(function () {
                 return window.setTimeout(callback, 1000 / 60);
             };
         })(),
-        touchPlayTimeout: 3000,
+        touchPlayTimeout: 5000,
         moveTimeoutID: null,
+        transitionTimeoutID: null,
+        dragPositionTimeoutID: null,
         rightBoundary: null,
         touchSpeed: 25,
         touchDistance: {
@@ -76,7 +79,8 @@ $('document').ready(function () {
 
         dragIt: function (touchX) {
 
-            var positionX,
+            var self = this,
+                positionX,
                 percentage = (this.progress * (100 / this.msTotal));
 
             positionX = this.direction * percentage;
@@ -87,7 +91,9 @@ $('document').ready(function () {
             // update percentage
             this.percentage = Math.abs(parseFloat(positionX));
 
-            this.position(positionX);
+            self.dragPositionTimeoutID = setTimeout(function(){    
+                self.position(positionX);
+            }, 50);
         },
 
         position: function (posX) {
@@ -105,7 +111,7 @@ $('document').ready(function () {
 
             // set listeners
             this.$moveElement.on('touchstart mousedown', function (e) {
-                
+
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
 
@@ -113,10 +119,18 @@ $('document').ready(function () {
 
                 clearTimeout(self.animationFrameID);
                 clearTimeout(self.moveTimeoutID);
+                clearTimeout(self.transitionTimeoutID);
 
-                //self.$moveElement.addClass('touch');
+                Boolean(self.swipeMode) === true ? self.$moveElement.addClass('touch') : null;
 
                 self.touchDistance.start = touch.pageX;
+
+                // ease out (is triggered on touchend)
+                self.$moveElement.off('transitionend').on('transitionend', function(e){
+                    if (e.originalEvent.propertyName === 'transform') {
+                        self.$moveElement.removeClass('dragTransition');
+                    }
+                });
             
             });
 
@@ -130,6 +144,11 @@ $('document').ready(function () {
 
                 self.progress = self.progressByPercentage(self.percentage);
 
+                // trigger the transition (the drag position x setter, has a small delay)
+                // allowing this to work
+                self.$moveElement.addClass('dragTransition');
+
+                // play from where the user left `dragging`
                 self.moveTimeoutID = setTimeout(function () {
 
                     clearTimeout(self.moveTimeoutID);
@@ -137,9 +156,11 @@ $('document').ready(function () {
                     playFrom = Date.now();
                     playFrom = playFrom - self.progress;
 
+                    console.log('playFrom', playFrom);
+                    
                     self.step(playFrom);
                 
-                    //self.$moveElement.removeClass('touch');
+                    Boolean(self.swipeMode) === true ? self.$moveElement.removeClass('touch') : null;
 
                 }, self.touchPlayTimeout);
 
@@ -149,18 +170,6 @@ $('document').ready(function () {
 
                 var touch = e.originalEvent.touches[0],
                     distance = 0;
-
-                /*
-                if (touch.pageX < self.oldX) {
-
-                    self.direction = -1;
-
-                } else if (touch.pageX > self.oldX) {
-
-                    self.direction = 1;
-
-                }
-                */
 
                 self.oldX = touch.pageX;
                 self.touchDistance.end = touch.pageX;
