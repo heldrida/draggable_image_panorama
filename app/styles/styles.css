@@ -1,0 +1,8 @@
+.panorama {
+  width: 50%;
+  height: 300px;
+  margin: 0 auto;
+  overflow: hidden; }
+  .panorama img {
+    position: relative;
+    transition: opacity 0.6s ease; }
