@@ -152,9 +152,13 @@ $('document').ready(function () {
                 self.moveTimeoutID = setTimeout(function () {
 
                     clearTimeout(self.moveTimeoutID);
- 
+
                     playFrom = Date.now();
                     playFrom = playFrom - self.progress;
+
+                    // ensure transition is not enabled before proceeding
+                    // with step animation
+                    self.$moveElement.removeClass('dragTransition');
 
                     self.step(playFrom);
                 
