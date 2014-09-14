@@ -115,7 +115,7 @@ $('document').ready(function () {
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
 
-                var touch = e.originalEvent.touches[0];
+                var touch = e.type === "mousedown" ? e : e.originalEvent.touches[0];
 
                 clearTimeout(self.animationFrameID);
                 clearTimeout(self.moveTimeoutID);
@@ -134,7 +134,7 @@ $('document').ready(function () {
             
             });
 
-            this.$moveElement.on('touchend mouseup', function (e) {
+            this.$moveElement.on('touchend mouseup ', function (e) {
                 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
@@ -156,8 +156,6 @@ $('document').ready(function () {
                     playFrom = Date.now();
                     playFrom = playFrom - self.progress;
 
-                    console.log('playFrom', playFrom);
-                    
                     self.step(playFrom);
                 
                     Boolean(self.swipeMode) === true ? self.$moveElement.removeClass('touch') : null;
@@ -166,9 +164,9 @@ $('document').ready(function () {
 
             });
 
-            this.$moveElement.on('touchmove', function (e) {
+            this.$moveElement.on('touchmove drag', function (e) {
 
-                var touch = e.originalEvent.touches[0],
+                var touch = e.type === 'drag' || e.type === 'mousemove' ? e : e.originalEvent.touches[0],
                     distance = 0;
 
                 self.oldX = touch.pageX;
