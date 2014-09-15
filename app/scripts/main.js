@@ -61,6 +61,8 @@ $('document').ready(function () {
             // stop recursive call if finished
             if (self.percentage >= this.rightBoundary) {
 
+                clearTimeout(self.animationFrameID);
+
                 // if a callback is set, call it when step animation finished
                 if (typeof self.callback === "object") {
                     $.each(self.callback, function (index, fn) {
@@ -120,23 +122,31 @@ $('document').ready(function () {
 
             var self = this;
 
-            /*
             self.$moveElement.on('transitionend', function (e) {
+
                 if (e.originalEvent.propertyName === 'opacity') {
-                    self.$moveElement.removeClass('end');
+
+                    if (self.$moveElement.css('opacity') === "0") {
+
+                        // reset properties
+                        self.percentage = 0;
+                        self.progress = 0;
+                        self.position(0);
+
+                        self.$moveElement.removeClass('end');
+
+                    } else {
+
+                        // reInitialise the step animation
+                        self.step(Date.now());
+
+                    }
+
                 }
+
             });
-            */
 
             self.$moveElement.addClass('end');
-
-            self.percentage = 0;
-            self.progress = 0;
-            self.position(0);
-
-            self.$moveElement.fadeIn(function () {
-                self.step(0);
-            });
 
         },
 
@@ -218,7 +228,7 @@ $('document').ready(function () {
                 distance = self.touchDistance.end - self.touchDistance.start;
 
                 self.dragIt(distance);
-                
+
             });
 
             // set animation finish callback
