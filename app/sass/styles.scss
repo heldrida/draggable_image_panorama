@@ -18,7 +18,10 @@ html {
 		    position: relative;
 		    transition: opacity 0.6s ease;
 		    transform-origin:left top;
-
+		    cursor: pointer;
+		    cursor: -webkit-grab;
+			opacity: 1;
+			
 		    &.touch {
 		    	position: relative;
 		    	transition: transform 0.4s ease-in-out;
@@ -27,6 +30,11 @@ html {
 		    &.dragTransition {
 		    	transition: transform 1.0s ease-out;
 		    }
+
+			&.end {
+				opacity: 0;
+			}
+
 		  }
 
 		}

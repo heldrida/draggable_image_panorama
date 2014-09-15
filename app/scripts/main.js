@@ -31,6 +31,7 @@ $('document').ready(function () {
             start: 0,
             end: 0
         },
+        callback: [],
     
         // methods
         step: function (timestart) {
@@ -55,6 +56,19 @@ $('document').ready(function () {
                 self.animationFrameID = self.myRequestAnimationFrame(function () {
                     self.step.call(self, timestart);
                 });
+            }
+
+            // stop recursive call if finished
+            if (self.percentage >= this.rightBoundary) {
+
+                // if a callback is set, call it when step animation finished
+                if (typeof self.callback === "object") {
+                    $.each(self.callback, function (index, fn) {
+                        console.log('fn', fn);
+                        fn();
+                    });
+                }
+
             }
   
         },
@@ -99,6 +113,30 @@ $('document').ready(function () {
         position: function (posX) {
             
             this.$moveElement.css('transform', 'translateX(' + posX + ')');
+
+        },
+
+        reset: function () {
+
+            var self = this;
+
+            /*
+            self.$moveElement.on('transitionend', function (e) {
+                if (e.originalEvent.propertyName === 'opacity') {
+                    self.$moveElement.removeClass('end');
+                }
+            });
+            */
+
+            self.$moveElement.addClass('end');
+
+            self.percentage = 0;
+            self.progress = 0;
+            self.position(0);
+
+            self.$moveElement.fadeIn(function () {
+                self.step(0);
+            });
 
         },
     
@@ -181,6 +219,9 @@ $('document').ready(function () {
                 self.dragIt(distance);
 
             });
+
+            // set animation finish callback
+            this.callback.push(this.reset.bind(this));
 
             this.step(Date.now());
     
