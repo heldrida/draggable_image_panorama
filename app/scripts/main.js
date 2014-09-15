@@ -10,7 +10,7 @@ $('document').ready(function () {
         $moveElement: $('.panorama img'),
         swipeMode: $('.panorama').data('swipe'),
         timestart: 0,
-        seconds: 12,
+        seconds: 60,
         msTotal: 0,
         direction: -1,
         positionX: 0,
