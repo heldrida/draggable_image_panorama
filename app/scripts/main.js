@@ -158,7 +158,8 @@ $('document').ready(function () {
             this.msTotal = this.seconds * 1000;
 
             // set listeners
-            this.$moveElement.on('touchstart mousedown', function (e) {
+            this.$moveElement.on('tap touchstart mousedown', function (e) {
+                console.log('touchstart or tap', Date.now());
 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
@@ -174,7 +175,7 @@ $('document').ready(function () {
                 self.touchDistance.start = touch.pageX;
 
                 // ease out (is triggered on touchend)
-                self.$moveElement.off('transitionend').on('transitionend', function(e){
+                self.$moveElement/*.off('transitionend')*/.on('transitionend', function (e) {
                     if (e.originalEvent.propertyName === 'transform') {
                         self.$moveElement.removeClass('dragTransition');
                     }
@@ -183,6 +184,8 @@ $('document').ready(function () {
             });
 
             this.$moveElement.on('touchend mouseup', function (e) {
+
+                console.log('touchend', Date.now());
 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
