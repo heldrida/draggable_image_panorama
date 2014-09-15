@@ -66,7 +66,6 @@ $('document').ready(function () {
                 // if a callback is set, call it when step animation finished
                 if (typeof self.callback === "object") {
                     $.each(self.callback, function (index, fn) {
-                        console.log('fn', fn);
                         fn();
                     });
                 }
@@ -175,7 +174,7 @@ $('document').ready(function () {
                 self.touchDistance.start = touch.pageX;
 
                 // ease out (is triggered on touchend)
-                self.$moveElement/*.off('transitionend')*/.on('transitionend', function (e) {
+                self.$moveElement.off('transitionend').on('transitionend', function (e) {
                     if (e.originalEvent.propertyName === 'transform') {
                         self.$moveElement.removeClass('dragTransition');
                     }
