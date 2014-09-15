@@ -3,7 +3,7 @@
 'use strict';
 
 $('document').ready(function () {
-  
+
     var panorama = {
         // properties
         $panorama: $('.panorama'),
@@ -20,7 +20,7 @@ $('document').ready(function () {
             return function (callback) {
                 return window.setTimeout(callback, 1000 / 60);
             };
-        })(),
+        }()),
         touchPlayTimeout: 5000,
         moveTimeoutID: null,
         transitionTimeoutID: null,
@@ -32,14 +32,14 @@ $('document').ready(function () {
             end: 0
         },
         callback: [],
-    
+
         // methods
         step: function (timestart) {
 
             var self = this,
                 timestamp,
                 positionX;
-    
+
             timestamp = Date.now();
             self.progress = timestamp - timestart;
             self.percentage = (self.progress * (100 / self.msTotal));
@@ -49,7 +49,7 @@ $('document').ready(function () {
             positionX += '%';
 
             self.position(positionX);
-  
+
             if (self.progress < self.msTotal) {
                 timestamp += 10;
 
@@ -70,7 +70,7 @@ $('document').ready(function () {
                 }
 
             }
-  
+
         },
 
         positionBounderies: function (positionX) {
@@ -105,13 +105,13 @@ $('document').ready(function () {
             // update percentage
             this.percentage = Math.abs(parseFloat(positionX));
 
-            self.dragPositionTimeoutID = setTimeout(function(){    
+            self.dragPositionTimeoutID = setTimeout(function () {
                 self.position(positionX);
             }, 50);
         },
 
         position: function (posX) {
-            
+
             this.$moveElement.css('transform', 'translateX(' + posX + ')');
 
         },
@@ -139,9 +139,9 @@ $('document').ready(function () {
             });
 
         },
-    
+
         init: function () {
-  
+
             var self = this;
 
             // set initial values
@@ -169,11 +169,11 @@ $('document').ready(function () {
                         self.$moveElement.removeClass('dragTransition');
                     }
                 });
-            
+
             });
 
-            this.$moveElement.on('touchend mouseup ', function (e) {
-                
+            this.$moveElement.on('touchend mouseup', function (e) {
+
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
 
@@ -199,10 +199,11 @@ $('document').ready(function () {
                     self.$moveElement.removeClass('dragTransition');
 
                     self.step(playFrom);
-                
+
                     Boolean(self.swipeMode) === true ? self.$moveElement.removeClass('touch') : null;
 
                 }, self.touchPlayTimeout);
+
 
             });
 
@@ -217,18 +218,18 @@ $('document').ready(function () {
                 distance = self.touchDistance.end - self.touchDistance.start;
 
                 self.dragIt(distance);
-
+                
             });
 
             // set animation finish callback
             this.callback.push(this.reset.bind(this));
 
             this.step(Date.now());
-    
+
         }
 
     };
 
     panorama.init();
-  
+
 });
