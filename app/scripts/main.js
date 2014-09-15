@@ -134,7 +134,7 @@ $('document').ready(function () {
 
             });
 
-            this.$moveElement.on('touchend mouseup ', function (e) {
+            this.$moveElement.on('touchend mouseup', function (e) {
 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
@@ -166,6 +166,7 @@ $('document').ready(function () {
 
                 }, self.touchPlayTimeout);
 
+
             });
 
             this.$moveElement.on('touchmove drag', function (e) {
@@ -179,7 +180,7 @@ $('document').ready(function () {
                 distance = self.touchDistance.end - self.touchDistance.start;
 
                 self.dragIt(distance);
-
+                
             });
 
             this.step(Date.now());
