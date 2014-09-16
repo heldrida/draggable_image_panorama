@@ -58,6 +58,7 @@
             end: 0
         };
         this.callback = [];
+        this.zoomLevel = 1;
 
         // methods
         this.step = function (timestart) {
@@ -175,6 +176,44 @@
 
         };
 
+        this.zoomIt = function (nrTaps) {
+
+            if (nrTaps === 2) {
+
+                this.$moveElement.toggleClass('zoom');
+
+            }
+
+        };
+
+        this.setZoomListeners = function () {
+
+            var self = this,
+                timeout = null,
+                touched = 0,
+                touchMs = 430;
+
+            // track number of taps of a given `timeframe`
+            this.$panorama.on('touchstart tap click', function () {
+
+                // increment nr of taps
+                touched += 1;
+
+                timeout = setTimeout(function () {
+
+                    clearTimeout(timeout);
+
+                    // dispatch to zoom handler
+                    self.zoomIt(touched);
+
+                    // clear nr of taps after nr of ms
+                    touched = 0;
+
+                }, touchMs);
+            });
+
+        };
+
         this.init = function ($element) {
 
             var self = this;
@@ -186,6 +225,8 @@
             this.msTotal = this.seconds * 1000;
 
             // set listeners
+            this.setZoomListeners();
+
             this.$moveElement.on('tap touchstart mousedown', function (e) {
                 console.log('touchstart or tap', Date.now());
 

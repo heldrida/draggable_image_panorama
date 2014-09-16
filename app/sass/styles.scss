@@ -10,6 +10,7 @@ html {
 		.panorama {
 			width: 80%;
 			height: 80%;
+			max-height: 500px;
 			margin: 0 auto 5em auto;
 			overflow: hidden;
 			border: 8px solid #FC0;
@@ -37,6 +38,11 @@ html {
 
 			&.end {
 				opacity: 0;
+			}
+
+			&.zoom {
+		    	transition: height 1.0s ease-out;
+				height: 200% !important;
 			}
 
 		  }
