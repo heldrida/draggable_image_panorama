@@ -8,6 +8,9 @@
  * To use do $('#ID').panorama()
  *
  * Original author: @heldrida (Helder C.)
+ *
+ * For mouse drag add the following plugin: Touch enabled jQuery.event.drag
+ * http://www.shamasis.net/projects/jquery-drag-touch/
  * 
  * DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
  * Version 2, December 2004
