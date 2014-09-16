@@ -1,40 +1,63 @@
-/*globals $, window */
+/*globals $, window, jQuery */
 
 'use strict';
 
-$('document').ready(function () {
+/***
+ * jQuery Dragabble Image Panorama plugin
+ *
+ * To use do $('#ID').panorama()
+ *
+ * Original author: @heldrida (Helder C.)
+ * 
+ * DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ * Version 2, December 2004
+ *
+ * Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
 
-    var panorama = {
+ * Everyone is permitted to copy and distribute verbatim or modified
+ * copies of this license document, and changing it is allowed as long
+ * as the name is changed.
+ * 
+ * DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+ * TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION 
+ * 
+ * 0. You just DO WHAT THE FUCK YOU WANT TO.
+ * 
+ */
+(function ($) {
+
+    function Panorama($element) {
+
         // properties
-        $panorama: $('.panorama'),
-        $moveElement: $('.panorama img'),
-        swipeMode: $('.panorama').data('swipe'),
-        timestart: 0,
-        seconds: 60,
-        msTotal: 0,
-        direction: -1,
-        positionX: 0,
-        percentage: 0,
-        animationFrameID: false,
-        myRequestAnimationFrame: (function () {
+        this.$panorama = null;
+        this.$moveElement = null;
+        this.swipeMode = null;
+        this.timestart = 0;
+        this.seconds = 60;
+        this.msTotal = 0;
+        this.direction = -1;
+        this.positionX = 0;
+        this.percentage = 0;
+        this.animationFrameID = false;
+        this.myRequestAnimationFrame = (function () {
             return function (callback) {
                 return window.setTimeout(callback, 1000 / 60);
             };
-        }()),
-        touchPlayTimeout: 5000,
-        moveTimeoutID: null,
-        transitionTimeoutID: null,
-        dragPositionTimeoutID: null,
-        rightBoundary: null,
-        touchSpeed: 25,
-        touchDistance: {
+        }());
+        this.touchPlayTimeout = 5000;
+        this.moveTimeoutID = null;
+        this.transitionTimeoutID = null;
+        this.dragPositionTimeoutID = null;
+        this.rightBoundary = null;
+        this.touchSpeed = 25;
+        this.touchDistance = {
             start: 0,
             end: 0
-        },
-        callback: [],
+        };
+        this.callback = [];
 
         // methods
-        step: function (timestart) {
+        this.step = function (timestart) {
 
             var self = this,
                 timestamp,
@@ -72,9 +95,9 @@ $('document').ready(function () {
 
             }
 
-        },
+        };
 
-        positionBounderies: function (positionX) {
+        this.positionBounderies = function (positionX) {
 
             // move the next line to init method, after image preload done!
             this.rightBoundary = 100 - (100 * (this.$panorama.width() / this.$moveElement.width()));
@@ -84,15 +107,15 @@ $('document').ready(function () {
 
             return positionX;
 
-        },
+        };
 
-        progressByPercentage: function (percentage) {
+        this.progressByPercentage = function (percentage) {
 
             return percentage * (this.msTotal / 100);
 
-        },
+        };
 
-        dragIt: function (touchX) {
+        this.dragIt = function (touchX) {
 
             var self = this,
                 positionX,
@@ -109,15 +132,15 @@ $('document').ready(function () {
             self.dragPositionTimeoutID = setTimeout(function () {
                 self.position(positionX);
             }, 50);
-        },
+        };
 
-        position: function (posX) {
+        this.position = function (posX) {
 
             this.$moveElement.css('transform', 'translateX(' + posX + ')');
 
-        },
+        };
 
-        reset: function () {
+        this.reset = function () {
 
             var self = this;
 
@@ -147,13 +170,16 @@ $('document').ready(function () {
 
             self.$moveElement.addClass('end');
 
-        },
+        };
 
-        init: function () {
+        this.init = function ($element) {
 
             var self = this;
 
             // set initial values
+            this.$panorama = $element;
+            this.$moveElement = $element.find('img');
+            this.swipeMode = $element.data('swipe');
             this.msTotal = this.seconds * 1000;
 
             // set listeners
@@ -183,8 +209,6 @@ $('document').ready(function () {
             });
 
             this.$moveElement.on('touchend mouseup', function (e) {
-
-                console.log('touchend', Date.now());
 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
@@ -238,10 +262,23 @@ $('document').ready(function () {
 
             this.step(Date.now());
 
-        }
+        };
 
+        this.init($element);
+
+    }
+
+    $.fn.panorama = function () {
+        return (function ($element) {
+            new Panorama($element);
+        }(this));
     };
 
-    panorama.init();
+}(jQuery));
+
+$('document').ready(function () {
+
+    $('#foo').panorama();
+    $('#bar').panorama();
 
 });
