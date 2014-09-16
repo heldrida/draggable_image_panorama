@@ -2,7 +2,9 @@
 
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
+var uglify = require('gulp-uglify');
 var reload = browserSync.reload;
+var rename = require('gulp-rename');
 var $ = require('gulp-load-plugins')();
 
 
@@ -32,12 +34,15 @@ gulp.task('styles', function () {
         .pipe($.sass({errLogToConsole: true}))
         .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest('app/styles'))
-        .pipe(reload({stream:true}))
-//        .pipe($.notify("Compilation complete."))
-        ;
+        .pipe(reload({stream:true}));
 });
 
-
+gulp.task('compress', function () {
+    return gulp.src('app/scripts/*.js')
+        .pipe(uglify())
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest('app/scripts'));
+});
 
 gulp.task('scripts', function () {
     return gulp.src('app/scripts/**/*.js')
@@ -63,4 +68,5 @@ gulp.task('watch', ['connect', 'serve'], function () {
     });
 
 });
+
 
