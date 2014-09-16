@@ -42,11 +42,22 @@
         this.positionX = 0;
         this.percentage = 0;
         this.animationFrameID = false;
-        this.myRequestAnimationFrame = (function () {
-            return function (callback) {
-                return window.setTimeout(callback, 1000 / 60);
+
+        this.myRequestAnimationFrame =  window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            (function () {
+                return function (callback) {
+                    return window.setTimeout(callback, 1000 / 60);
+                };
+            }());
+
+        if (!window.cancelAnimationFrame) {
+            window.cancelAnimationFrame = function (id) {
+                clearTimeout(id);
             };
-        }());
+        }
+
         this.touchPlayTimeout = 5000;
         this.moveTimeoutID = null;
         this.transitionTimeoutID = null;
@@ -79,7 +90,7 @@
             if (self.progress < self.msTotal) {
                 timestamp += 10;
 
-                self.animationFrameID = self.myRequestAnimationFrame(function () {
+                self.animationFrameID = self.myRequestAnimationFrame.call(window, function () {
                     self.step.call(self, timestart);
                 });
             }
@@ -87,7 +98,7 @@
             // stop recursive call if finished
             if (self.percentage >= this.rightBoundary) {
 
-                clearTimeout(self.animationFrameID);
+                cancelAnimationFrame.call(window, self.animationFrameID);
 
                 // if a callback is set, call it when step animation finished
                 if (typeof self.callback === "object") {
@@ -194,9 +205,9 @@
 
                 var touch = e.type === "mousedown" ? e : e.originalEvent.touches[0];
 
-                clearTimeout(self.animationFrameID);
-                clearTimeout(self.moveTimeoutID);
-                clearTimeout(self.transitionTimeoutID);
+                cancelAnimationFrame.call(window, self.animationFrameID);
+                cancelAnimationFrame.call(window, self.moveTimeoutID);
+                cancelAnimationFrame.call(window, self.transitionTimeoutID);
 
                 Boolean(self.swipeMode) === true ? self.$moveElement.addClass('touch') : null;
 
@@ -228,7 +239,8 @@
                 // play from where the user left `dragging`
                 self.moveTimeoutID = setTimeout(function () {
 
-                    clearTimeout(self.moveTimeoutID);
+                    cancelAnimationFrame.call(window, self.moveTimeoutID);
+                    cancelAnimationFrame.call(window, self.dragPositionTimeoutID);
 
                     playFrom = Date.now();
                     playFrom = playFrom - self.progress;
