@@ -187,7 +187,6 @@
 
             // set listeners
             this.$moveElement.on('tap touchstart mousedown', function (e) {
-                console.log('touchstart or tap', Date.now());
 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();

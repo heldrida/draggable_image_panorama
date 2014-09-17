@@ -41,7 +41,7 @@ gulp.task('compress', function () {
     return gulp.src('app/scripts/*.js')
         .pipe(uglify())
         .pipe(rename({ suffix: '.min' }))
-        .pipe(gulp.dest('app/scripts'));
+        .pipe(gulp.dest('distro/scripts'));
 });
 
 gulp.task('scripts', function () {
