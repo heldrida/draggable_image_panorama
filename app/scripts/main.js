@@ -36,7 +36,7 @@
         this.$moveElement = null;
         this.swipeMode = null;
         this.timestart = 0;
-        this.seconds = 60;
+        this.seconds = 5;
         this.msTotal = 0;
         this.direction = -1;
         this.positionX = 0;
@@ -58,9 +58,13 @@
             end: 0
         };
         this.callback = [];
+        this.reverse = true;
+        this.loops = 0; // can be deleted (development only)
 
         // methods
         this.step = function (timestart) {
+
+            console.log('step');
 
             var self = this,
                 timestamp,
@@ -89,13 +93,51 @@
 
                 clearTimeout(self.animationFrameID);
 
-                // if a callback is set, call it when step animation finished
-                if (typeof self.callback === "object") {
-                    $.each(self.callback, function (index, fn) {
-                        fn();
-                    });
+                if (self.reverse) {
+
+                    this.stepReverse();
+
+                } else {
+
+                    clearTimeout(self.animationFrameID);
+
+                    this.reverse = true;
+
+                    // if a callback is set, call it when step animation finished
+                    if (typeof self.callback === "object") {
+                        $.each(self.callback, function (index, fn) {
+                            fn();
+                        });
+                    }
+
                 }
 
+            }
+
+        };
+
+        this.stepReverse = function () {
+            console.log('stepReverse');
+            var self = this,
+                positionX;
+
+            if (self.loop > 250) {
+                clearTimeout(self.animationFrameID);
+                return;
+            }
+
+            self.loop += 1;
+            self.percentage += self.percentage;
+            positionX = self.percentage;
+            positionX += '%';
+
+            self.animationFrameID = self.myRequestAnimationFrame(function () {
+                self.step.call(self, timestart);
+            });
+
+            if (self.percentage >= this.rightBoundary) {
+                clearTimeout(self.animationFrameID);
+                self.step(0);
             }
 
         };
