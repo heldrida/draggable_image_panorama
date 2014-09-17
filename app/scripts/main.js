@@ -59,31 +59,46 @@
         };
         this.callback = [];
         this.reverse = true;
-        this.loops = 0; // can be deleted (development only)
+        this.lastPositionX = 0;
+        this.frameDiff = [];
+        this.frameDiffAverage = function () {
+            
+            var i, t = 0, avr = 0;
+
+            for (i = 0; i < this.frameDiff.length; i++) {
+                t = t + parseFloat(this.frameDiff[i]);
+            }
+
+            avr = (t / this.frameDiff.length) / 100;
+            
+            return avr ? avr : false;
+        
+        };
+        this.frameAverage = 0;
 
         // methods
-        var u = 0;
         this.step = function (timestart) {
-
-            console.log('step');
 
             var self = this,
                 timestamp,
                 positionX;
 
-            timestamp = Date.now();
+            timestamp = performance.now();
             self.progress = timestamp - timestart;
             self.percentage = (self.progress * (100 / self.msTotal));
+
+            // track percentage values (for average calculation)
+            this.frameDiff.push(self.percentage);
 
             positionX = self.direction * self.percentage;
             positionX = self.positionBounderies(positionX);
             positionX += '%';
 
-            self.position(positionX);
+            // set the position (prevent performance issues by just accepting increment)
+            parseFloat(positionX) < parseFloat(self.lastPositionX) ? self.position(positionX) : null;
+            self.lastPositionX = parseFloat(positionX);
 
             if (self.progress < self.msTotal) {
-                timestamp += 10;
-
                 self.animationFrameID = self.myRequestAnimationFrame(function () {
                     self.step.call(self, timestart);
                 });
@@ -96,7 +111,10 @@
 
                 if (self.reverse) {
 
-                    this.stepReverse();
+                    // set frame average to use on step reverse
+                    this.frameAverage = this.frameDiffAverage();
+
+                    this.stepReverse(this.frameAverage);
 
                 } else {
 
@@ -117,35 +135,34 @@
 
         };
 
-        this.stepReverse = function () {
+        this.stepReverse = function (frameAverage) {
 
-            console.log('stepReverse');
             window.clearTimeout(this.animationFrameID);
 
             var self = this,
                 positionX;
 
             self.percentage = self.direction * Math.abs(self.percentage);
-            self.percentage += 0.25;
+            self.percentage += frameAverage;
             positionX = self.percentage + '%';
 
-            self.position(positionX);
+            // set the position (prevent performance issues by just accepting decrease)
+            parseFloat(positionX) > parseFloat(self.lastPositionX) ? self.position(positionX) : null;
+            self.lastPositionX = parseFloat(positionX);
 
             if (parseInt(self.percentage) === 0) {
-
-                console.log('stop!');
 
                 self.percentage = 0;
                 self.progress = 0;
                 self.position(0);
                 self.$moveElement.removeClass('end');
 
-                self.step(Date.now());
+                self.step(performance.now());
 
             } else {
 
                 self.animationFrameID = self.myRequestAnimationFrame(function () {
-                    self.stepReverse.call(self);
+                    self.stepReverse.call(self, frameAverage);
                 });
 
             }
@@ -233,7 +250,7 @@
                     } else {
 
                         // reInitialise the step animation
-                        self.step(Date.now());
+                        self.step(performance.now());
 
                     }
 
@@ -299,7 +316,7 @@
 
                     clearTimeout(self.moveTimeoutID);
 
-                    playFrom = Date.now();
+                    playFrom = performance.now();
                     playFrom = playFrom - self.progress;
 
                     // ensure transition is not enabled before proceeding
@@ -332,7 +349,7 @@
             // set animation finish callback
             this.callback.push(this.reset.bind(this));
 
-            this.step(Date.now());
+            this.step(performance.now());
 
         };
 
