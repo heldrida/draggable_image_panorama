@@ -91,7 +91,7 @@
             // stop recursive call if finished
             if (self.percentage >= this.rightBoundary) {
 
-                clearTimeout(self.animationFrameID);
+                window.clearTimeout(self.animationFrameID);
 
                 if (self.reverse) {
 
@@ -99,7 +99,7 @@
 
                 } else {
 
-                    clearTimeout(self.animationFrameID);
+                    window.clearTimeout(self.animationFrameID);
 
                     this.reverse = true;
 
@@ -117,29 +117,29 @@
         };
 
         this.stepReverse = function () {
+
             console.log('stepReverse');
+            window.clearTimeout(this.animationFrameID);
+
             var self = this,
                 positionX;
 
-            if (self.loop > 250) {
-                clearTimeout(self.animationFrameID);
-                return;
-            }
+            self.percentage = self.direction * Math.abs(self.percentage);
+            self.percentage += 1;
+            positionX = self.percentage + '%';
 
-            self.loop += 1;
-            self.percentage += self.percentage;
-            positionX = self.percentage;
-            positionX += '%';
+            self.position(positionX);
 
             self.animationFrameID = self.myRequestAnimationFrame(function () {
-                self.step.call(self, timestart);
+                self.stepReverse.call(self);
             });
 
-            if (self.percentage >= this.rightBoundary) {
-                clearTimeout(self.animationFrameID);
+            console.log('self.percentage', self.percentage);
+
+            if (self.percentage === this.leftBoundary) {
+                window.clearTimeout(self.animationFrameID);
                 self.step(0);
             }
-
         };
 
         this.positionBounderies = function (positionX) {
