@@ -62,6 +62,7 @@
         this.loops = 0; // can be deleted (development only)
 
         // methods
+        var u = 0;
         this.step = function (timestart) {
 
             console.log('step');
@@ -125,6 +126,32 @@
                 positionX;
 
             self.percentage = self.direction * Math.abs(self.percentage);
+            self.percentage += 0.25;
+            positionX = self.percentage + '%';
+
+            self.position(positionX);
+
+            if (parseInt(self.percentage) === 0) {
+
+                console.log('stop!');
+
+                self.percentage = 0;
+                self.progress = 0;
+                self.position(0);
+                self.$moveElement.removeClass('end');
+
+                self.step(Date.now());
+
+            } else {
+
+                self.animationFrameID = self.myRequestAnimationFrame(function () {
+                    self.stepReverse.call(self);
+                });
+
+            }
+
+            /*
+            self.percentage = self.direction * Math.abs(self.percentage);
             self.percentage += 1;
             positionX = self.percentage + '%';
 
@@ -140,6 +167,7 @@
                 window.clearTimeout(self.animationFrameID);
                 self.step(0);
             }
+            */
         };
 
         this.positionBounderies = function (positionX) {
