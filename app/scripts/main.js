@@ -70,7 +70,7 @@
             }
 
             avr = (t / this.frameDiff.length) / 100;
-            
+
             return avr ? avr : false;
         
         };
@@ -83,6 +83,8 @@
                 timestamp,
                 positionX;
 
+            self.direciton= -1;
+
             timestamp = performance.now();
             self.progress = timestamp - timestart;
             self.percentage = (self.progress * (100 / self.msTotal));
@@ -90,7 +92,7 @@
             // track percentage values (for average calculation)
             this.frameDiff.push(self.percentage);
 
-            positionX = self.direction * self.percentage;
+            positionX = -1 * self.percentage;
             positionX = self.positionBounderies(positionX);
             positionX += '%';
 
@@ -120,8 +122,6 @@
 
                     window.clearTimeout(self.animationFrameID);
 
-                    this.reverse = true;
-
                     // if a callback is set, call it when step animation finished
                     if (typeof self.callback === "object") {
                         $.each(self.callback, function (index, fn) {
@@ -142,7 +142,9 @@
             var self = this,
                 positionX;
 
-            self.percentage = self.direction * Math.abs(self.percentage);
+
+            self.direction = 1;
+            self.percentage = -1 * Math.abs(self.percentage);
             self.percentage += frameAverage;
             positionX = self.percentage + '%';
 
@@ -155,7 +157,7 @@
                 self.percentage = 0;
                 self.progress = 0;
                 self.position(0);
-                self.$moveElement.removeClass('end');
+                //self.$moveElement.removeClass('end');
 
                 self.step(performance.now());
 
@@ -167,24 +169,6 @@
 
             }
 
-            /*
-            self.percentage = self.direction * Math.abs(self.percentage);
-            self.percentage += 1;
-            positionX = self.percentage + '%';
-
-            self.position(positionX);
-
-            self.animationFrameID = self.myRequestAnimationFrame(function () {
-                self.stepReverse.call(self);
-            });
-
-            console.log('self.percentage', self.percentage);
-
-            if (self.percentage === this.leftBoundary) {
-                window.clearTimeout(self.animationFrameID);
-                self.step(0);
-            }
-            */
         };
 
         this.positionBounderies = function (positionX) {
@@ -206,13 +190,15 @@
         };
 
         this.dragIt = function (touchX) {
-
+            
             var self = this,
-                positionX,
-                percentage = (this.progress * (100 / this.msTotal));
+                positionX;
+                //percentage = (this.progress * (100 / this.msTotal));
 
-            positionX = this.direction * percentage;
-            positionX = positionX + (touchX / this.touchSpeed);
+            this.percentage = Math.abs(this.percentage);
+
+            positionX = -1 * self.percentage;
+            positionX = positionX + ((touchX / 3000));
             positionX = this.positionBounderies(positionX);
             positionX += '%';
 
@@ -323,7 +309,7 @@
                     // with step animation
                     self.$moveElement.removeClass('dragTransition');
 
-                    self.step(playFrom);
+                    self.direction < 0 ? self.step(playFrom) : self.stepReverse(self.frameAverage);
 
                     Boolean(self.swipeMode) === true ? self.$moveElement.removeClass('touch') : null;
 
@@ -341,7 +327,7 @@
                 self.touchDistance.end = touch.pageX;
 
                 distance = self.touchDistance.end - self.touchDistance.start;
-
+console.log(distance);
                 self.dragIt(distance);
 
             });
