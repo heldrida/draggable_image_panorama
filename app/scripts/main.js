@@ -38,6 +38,7 @@
         this.timestart = 0;
         this.seconds = 30;
         this.msTotal = 0;
+        this.touchPlayTimeout = 1000; // after touch pause timeout
         this.direction = -1;
         this.positionX = 0;
         this.percentage = 0;
@@ -47,7 +48,6 @@
                 return window.setTimeout(callback, 1000 / 60);
             };
         }());
-        this.touchPlayTimeout = 5000;
         this.moveTimeoutID = null;
         this.transitionTimeoutID = null;
         this.dragPositionTimeoutID = null;
@@ -73,7 +73,7 @@
                 t = t + parseFloat(this.frameDiff[i]);
             }
 
-            avr = (t / this.frameDiff.length) / 100;
+            avr = (t / this.frameDiff.length);
 
             return avr ? avr : false;
 
@@ -160,7 +160,7 @@
 
             self.direction = 1;
             self.percentage = -1 * Math.abs(self.percentage);
-            self.percentage += frameAverage;
+            self.percentage += frameAverage * (100 / self.msTotal);
             positionX = self.percentage + '%';
 
             // set the position (prevent performance issues by just accepting decrease)
@@ -172,7 +172,6 @@
                 self.percentage = 0;
                 self.progress = 0;
                 self.position(0);
-                //self.$moveElement.removeClass('end');
 
                 self.step(performance.now());
 
