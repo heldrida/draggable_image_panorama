@@ -36,7 +36,7 @@
         this.$moveElement = null;
         this.swipeMode = null;
         this.timestart = 0;
-        this.seconds = 5;
+        this.seconds = 30;
         this.msTotal = 0;
         this.direction = -1;
         this.positionX = 0;
@@ -61,8 +61,11 @@
         this.reverse = true;
         this.lastPositionX = 0;
         this.frameDiff = [];
+        this.frameAverage = 0;
+
+        // methods
         this.frameDiffAverage = function () {
-            
+
             var i, t = 0, avr = 0;
 
             for (i = 0; i < this.frameDiff.length; i++) {
@@ -72,11 +75,23 @@
             avr = (t / this.frameDiff.length) / 100;
 
             return avr ? avr : false;
-        
-        };
-        this.frameAverage = 0;
 
-        // methods
+        };
+
+        this.preloadImage = function (src, callback) {
+            var img = new Image(),
+                imageSrc = src;
+
+            img.onload = function () {
+                console.log('src', src);
+                console.log(typeof callback);
+                callback();
+
+            };
+
+            img.src = imageSrc;
+        };
+
         this.step = function (timestart) {
 
             var self = this,
@@ -173,9 +188,6 @@
 
         this.positionBounderies = function (positionX) {
 
-            // move the next line to init method, after image preload done!
-            this.rightBoundary = 100 - (100 * (this.$panorama.width() / this.$moveElement.width()));
-
             positionX = positionX > 0 ? 0 : positionX;
             positionX = (positionX < 0 && Math.abs(positionX) > this.rightBoundary) ? this.direction * this.rightBoundary : positionX;
 
@@ -190,15 +202,15 @@
         };
 
         this.dragIt = function (touchX) {
-            
+
             var self = this,
-                positionX;
-                //percentage = (this.progress * (100 / this.msTotal));
+                positionX,
+                resistance = 3000;
 
             this.percentage = Math.abs(this.percentage);
 
             positionX = -1 * self.percentage;
-            positionX = positionX + ((touchX / 3000));
+            positionX = positionX + ((touchX / resistance));
             positionX = this.positionBounderies(positionX);
             positionX += '%';
 
@@ -253,10 +265,10 @@
             var self = this;
 
             // set initial values
-            this.$panorama = $element;
-            this.$moveElement = $element.find('img');
             this.swipeMode = $element.data('swipe');
-            this.msTotal = this.seconds * 1000;
+            this.rightBoundary = 100 - (100 * (this.$panorama.width() / this.$moveElement.width()));
+            // extend the nr of msTotal based on right boundary
+            this.msTotal = (this.seconds * 1000) + ((this.seconds * 1000) - ((this.seconds * 1000) * (this.rightBoundary / 100)));
 
             // set listeners
             this.$moveElement.on('tap touchstart mousedown', function (e) {
@@ -327,7 +339,7 @@
                 self.touchDistance.end = touch.pageX;
 
                 distance = self.touchDistance.end - self.touchDistance.start;
-console.log(distance);
+
                 self.dragIt(distance);
 
             });
@@ -339,7 +351,13 @@ console.log(distance);
 
         };
 
-        this.init($element);
+        // set elements nad preload image
+        this.$panorama = $element;
+        this.$moveElement = $element.find('img');
+
+        this.preloadImage(this.$moveElement.attr('src'), (function () {
+            this.init($element);
+        }).bind(this));
 
     }
 
