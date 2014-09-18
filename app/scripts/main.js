@@ -36,7 +36,7 @@
         this.$moveElement = null;
         this.swipeMode = null;
         this.timestart = 0;
-        this.seconds = 30;
+        this.seconds = 10;
         this.msTotal = 0;
         this.direction = -1;
         this.positionX = 0;
@@ -62,6 +62,7 @@
         this.lastPositionX = 0;
         this.frameDiff = [];
         this.frameAverage = 0;
+        this.dragEndPercentage = 0;
 
         // methods
         this.frameDiffAverage = function () {
@@ -98,7 +99,7 @@
                 timestamp,
                 positionX;
 
-            self.direciton= -1;
+            self.direction = -1;
 
             timestamp = performance.now();
             self.progress = timestamp - timestart;
@@ -201,8 +202,29 @@
 
         };
 
-        this.dragIt = function (touchX) {
+        this.dragIt = function (percentage, touchX) {
 
+            var self = this,
+                positionX;
+
+            console.log('this.direction', this.direction);
+            console.log('percentage', percentage);
+
+            positionX = this.direction * percentage;
+            positionX = positionX + (touchX / this.touchSpeed);
+            positionX = this.positionBounderies(positionX);
+            positionX += '%';
+
+            // update percentage
+            //this.percentage = Math.abs(parseFloat(positionX));
+            self.dragEndPercentage = Math.abs(parseFloat(positionX));
+            console.log('this.dragEndPercentage', this.dragEndPercentage);
+
+            self.dragPositionTimeoutID = setTimeout(function () {
+                self.position(positionX);
+            }, 50);
+
+            /*
             var self = this,
                 positionX,
                 resistance = 3000;
@@ -220,6 +242,7 @@
             self.dragPositionTimeoutID = setTimeout(function () {
                 self.position(positionX);
             }, 50);
+            */
         };
 
         this.position = function (posX) {
@@ -297,12 +320,20 @@
 
             this.$moveElement.on('touchend mouseup', function (e) {
 
+                console.log('touchend!');
+
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
 
                 // calculate where to play from using current progress
                 var playFrom = null;
 
+                if (this.direction > 0) {
+                    self.percentage = self.dragEndPercentage;
+                }
+
+                //self.percentage = this.direction > 0 ? self.percentage = self.dragEndPercentage : self.percentage;
+                self.percentage = self.dragEndPercentage;
                 self.progress = self.progressByPercentage(self.percentage);
 
                 // trigger the transition (the drag position x setter, has a small delay)
@@ -340,7 +371,7 @@
 
                 distance = self.touchDistance.end - self.touchDistance.start;
 
-                self.dragIt(distance);
+                self.dragIt(self.percentage, distance);
 
             });
 
