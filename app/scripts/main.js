@@ -36,7 +36,7 @@
         this.$moveElement = null;
         this.swipeMode = null;
         this.timestart = 0;
-        this.seconds = 10;
+        this.seconds = 30;
         this.msTotal = 0;
         this.direction = -1;
         this.positionX = 0;
@@ -84,9 +84,8 @@
                 imageSrc = src;
 
             img.onload = function () {
-                console.log('src', src);
-                console.log(typeof callback);
-                callback();
+
+                typeof callback === "function" ? callback() : null;
 
             };
 
@@ -319,8 +318,6 @@
             });
 
             this.$moveElement.on('touchend mouseup', function (e) {
-
-                console.log('touchend!');
 
                 // on mousedown prevent browser default `img` drag
                 e.preventDefault();
